@@ -11,35 +11,35 @@ bool IsCapital(char c);   //大写字母
 bool Isalphabet(char c);  //字母
 
 //处理对应字符
-bool IsSpace(char *s, int &index);   //处理空格以及换行
-char *IsSymbol(char *s, int &index); //处理特殊符号
-char *IsNumber(char *s, int &index); //处理数字
-char *IsWord(char *s, int &index);   //处理单词（标识符或关键字）
-char *IsString(char *s, int &index); //处理字符串
+bool IsSpace(char *s, int &index);                //处理空格以及换行
+char *IsSymbol(char *s, int &index);              //处理特殊符号
+char *IsNumber(char *s, int &index);              //处理数字
+char *IsWord(char *s, int &index);                //处理单词（标识符或关键字）
+char *IsString(char *s, int &index);              //处理字符串
+char *IsAnnotation(char *s, int &index, int len); //处理注释符
 
 void init();
 void judge(char *str, int length);
 
 struct Eworld
 {
-    Eworld* front;
+    Eworld *front;
     char str[15];
-    Eworld* next;
+    Eworld *next;
 };
 
 class Hash_Word
 {
-    public:
-        Hash_Word();
-        Eworld* findlist(char *s);
-        void insert(char *s); //导入
-        bool dele(char *s); //删除
-        bool search(char *s); //搜索
-       
-    private:
-        const static int n=47;
-        Eworld *hashtable;
-               
+  public:
+    Hash_Word();
+    Eworld *findlist(char *s);
+    void insert(char *s); //导入
+    bool dele(char *s);   //删除
+    bool search(char *s); //搜索
+
+  private:
+    const static int n = 47;
+    Eworld *hashtable;
 };
 
 Hash_Word hw;
@@ -49,57 +49,62 @@ Hash_Word::Hash_Word()
 {
     int i;
     hashtable = new Eworld[n];
-    for (i=0;i<n;i++)
+    for (i = 0; i < n; i++)
     {
-        hashtable[i].front=0;
-        hashtable[i].str[0]=0;
-        hashtable[i].next=0;
+        hashtable[i].front = 0;
+        hashtable[i].str[0] = 0;
+        hashtable[i].next = 0;
     }
 }
 
-Eworld* Hash_Word::findlist(char *s)
+Eworld *Hash_Word::findlist(char *s)
 {
-    int i,len,sum;
-    Eworld *p,*newnode;
-    len=strlen(s);
-    sum=0;
-    for (i=0;i<len;i++)
+    int i, len, sum;
+    Eworld *p, *newnode;
+    len = strlen(s);
+    sum = 0;
+    for (i = 0; i < len; i++)
     {
-        sum+=s[i];
+        sum += s[i];
     }
-    sum=sum%n;
-    p=&hashtable[sum];
+    sum = sum % n;
+    p = &hashtable[sum];
     return p;
 }
 
 void Hash_Word::insert(char *s)
 {
-    Eworld *p,*newnode;
-    p=findlist(s);
-    while ( p->next != 0 ) p=p->next;
-    newnode=new Eworld;
-    p->next=newnode;
-    newnode->front=p;
-    strcpy(newnode->str,s);
-    newnode->next=0;
+    Eworld *p, *newnode;
+    p = findlist(s);
+    while (p->next != 0)
+        p = p->next;
+    newnode = new Eworld;
+    p->next = newnode;
+    newnode->front = p;
+    strcpy(newnode->str, s);
+    newnode->next = 0;
 }
 
 bool Hash_Word::dele(char *s)
 {
     Eworld *p;
-    p=findlist(s);
-    while ( strcmp(p->str,s) != 0 && p->next != 0 ) p=p->next;
-    if ( strcmp(p->str,s) != 0 ) return false;
-    p->front->next=p->next;
+    p = findlist(s);
+    while (strcmp(p->str, s) != 0 && p->next != 0)
+        p = p->next;
+    if (strcmp(p->str, s) != 0)
+        return false;
+    p->front->next = p->next;
     return true;
 }
 
 bool Hash_Word::search(char *s)
 {
     Eworld *p;
-    p=findlist(s);
-    while ( strcmp(p->str,s) != 0 && p->next != 0 ) p=p->next;
-    if ( strcmp(p->str,s) != 0 ) return false;
+    p = findlist(s);
+    while (strcmp(p->str, s) != 0 && p->next != 0)
+        p = p->next;
+    if (strcmp(p->str, s) != 0)
+        return false;
     return true;
 }
 
@@ -133,11 +138,13 @@ void init()
 
     table['"'] = 6; //双引号"
 
+    table['/'] = 7; //注释
+
     //将关键字导入到hashtable
-    char key[][15]={"iostream","main","for","do","while","switch","case","return","include","break","if","else","default","using","namespace",
-                    "cout","cin","fstream","printf","scanf","cstdio","class","struct","public","private","protected",
-                    "iostream.h","int","char","double","float","bool","string","void"};
-    for (i=0;i<34;i++)
+    char key[][15] = {"iostream", "main", "for", "do", "while", "switch", "case", "return", "include", "break", "if", "else", "default", "using", "namespace",
+                      "cout", "cin", "fstream", "printf", "scanf", "cstdio", "class", "struct", "public", "private", "protected", "std",
+                      "iostream.h", "int", "char", "double", "float", "bool", "string", "void"};
+    for (i = 0; i < 34; i++)
     {
         hw.insert(key[i]);
     }
@@ -145,13 +152,13 @@ void init()
 
 void judge(char *str, int length)
 {
-    int index, t,flag;
-    flag=0;
+    int index, t, flag;
+    flag = 0;
     index = 0;
     while (index < length)
     {
         t = table[str[index]];
-        //0默认 1数字 2小写字母 3大写字母 4空格换行 5特殊符号 6双引号（串）
+        //0默认 1数字 2小写字母 3大写字母 4空格换行 5特殊符号 6双引号（串） 7注释“/”
         switch (t)
         {
         case 0:
@@ -186,14 +193,20 @@ void judge(char *str, int length)
             IsString(str, index);
             break;
         }
+        case 7: //注释
+        {
+            IsAnnotation(str, index, length);
+            break;
+        }
         default:
         {
-            flag=1;
+            flag = 1;
             cout << "不知道这是什么东西" << endl;
             break;
         }
         }
-        if (flag) break;
+        if (flag)
+            break;
     }
 }
 
@@ -241,8 +254,8 @@ char *IsSymbol(char *s, int &index)
         index++;
     }
     if (k != 0)
-        cout << ns << "\t\t\t"
-            << "特殊符号" << endl;
+        cout << ns << "\t\t\t\t"
+             << "特殊符号" << endl;
 }
 
 //判断是否为数字（常数）
@@ -257,7 +270,7 @@ char *IsNumber(char *s, int &index)
         index++;
     }
     if (k != 0)
-        cout << ns << "\t\t\t"
+        cout << ns << "\t\t\t\t"
              << "数" << endl;
     return ns;
 }
@@ -267,7 +280,7 @@ char *IsWord(char *s, int &index)
 {
     char *ns = new char[15];
     int k = 0;
-    bool flag=false;
+    bool flag = false;
     if (Isalphabet(s[index])) //第一个字母
     {
         ns[k] = s[index];
@@ -280,9 +293,13 @@ char *IsWord(char *s, int &index)
             index++;
         }
     }
-    flag=hw.search(ns);
-    if ( flag ) cout<<ns<<"\t\t\t"<<"关键字"<<endl;
-    else cout<<ns<<"\t\t\t"<<"标识符"<<endl;
+    flag = hw.search(ns);
+    if (flag)
+        cout << ns << "\t\t\t\t"
+             << "关键字" << endl;
+    else
+        cout << ns << "\t\t\t\t"
+             << "标识符" << endl;
 }
 
 //判断是否为串
@@ -301,15 +318,40 @@ char *IsString(char *s, int &index)
             k++;
             index++;
         }
-        ns[k]=s[index];
+        ns[k] = s[index];
         k++;
         index++;
     }
     if (k != 0)
-        cout << ns << "\t\t\t"
+        cout << ns << "\t\t\t\t"
              << "串" << endl;
 }
 
+//判断是否为串
+char *IsAnnotation(char *s, int &index, int len)
+{
+    char *ns = new char[50];
+    int k = 0;
+    if (s[index] == '/' && s[index+1] == '/')
+    {
+        ns[k] = s[index];
+        ns[++k] = s[++index];
+        k++;
+        index++;
+        while (index != len)
+        {
+            ns[k] = s[index];
+            k++;
+            index++;
+        }
+        ns[k] = s[index];
+        k++;
+        index++;
+    }
+    if (k != 0)
+        cout << ns << "\t\t\t\t"
+             << "注释" << endl;
+}
 
 int main()
 {
@@ -321,7 +363,7 @@ int main()
     fs.open("/Users/liyixun/git-code/vscode/c++/testcpp.txt", ios::in);
     while (!fs.eof())
     {
-        fs.getline(str,200);
+        fs.getline(str, 200);
         judge(str, strlen(str));
     }
     fs.close();

@@ -8,7 +8,7 @@
             "type": "shell",
             "command": "g++",
             "args": [
-                "test.cpp"
+                "nfa.cpp"
             ],
             "group": {
                 "kind": "build",

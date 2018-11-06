@@ -8,6 +8,19 @@
         "new": "cpp",
         "stdexcept": "cpp",
         "type_traits": "cpp",
-        "typeinfo": "cpp"
-    }
+        "typeinfo": "cpp",
+        "istream": "cpp",
+        "cstdio": "cpp",
+        "iostream": "cpp",
+        "iosfwd": "cpp",
+        "fstream": "cpp",
+        "locale": "cpp",
+        "ostream": "cpp",
+        "__string": "cpp",
+        "ios": "cpp",
+        "algorithm": "cpp",
+        "stack": "cpp",
+        "vector": "cpp"
+    },
+    "C_Cpp.errorSquiggles": "Disabled",
 }
