@@ -8,7 +8,7 @@
             "type": "shell",
             "command": "g++",
             "args": [
-                "nfa.cpp"
+                "UnionFind.cpp"
             ],
             "group": {
                 "kind": "build",

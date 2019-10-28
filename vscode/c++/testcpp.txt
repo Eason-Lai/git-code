@@ -1,8 +1,7 @@
-#include<iostream.h>
-using namespace std;
-int main()
-{
-   int i;
-   cin>>i; //输出i
-   if (i>3) cout<<"ok";
-}
+read x; 
+if ( x>0)  fact := 1;
+  do
+    fact := fact * x;
+    x := x - 1;
+  while ( x>0 );
+  write fact; 

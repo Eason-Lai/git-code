@@ -28,6 +28,12 @@ struct Eworld
     Eworld *next;
 };
 
+struct Word 
+{
+    char word[15];
+    char label[15]; 
+};
+
 class Hash_Word
 {
   public:
@@ -141,10 +147,10 @@ void init()
     table['/'] = 7; //注释
 
     //将关键字导入到hashtable
-    char key[][15] = {"iostream", "main", "for", "do", "while", "switch", "case", "return", "include", "break", "if", "else", "default", "using", "namespace",
+    char key[][15] = {"iostream", "main" ,"for", "do", "while", "switch", "case", "return", "include", "break", "if", "else", "default", "using", "namespace",
                       "cout", "cin", "fstream", "printf", "scanf", "cstdio", "class", "struct", "public", "private", "protected", "std",
-                      "iostream.h", "int", "char", "double", "float", "bool", "string", "void"};
-    for (i = 0; i < 34; i++)
+                      "iostream.h", "int", "char", "double", "float", "bool", "string", "void","write","read"};
+    for (i = 0; i < 37; i++)
     {
         hw.insert(key[i]);
     }
