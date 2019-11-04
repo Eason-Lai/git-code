@@ -2,6 +2,7 @@ import cv2 as cv
 import numpy as np
 import random 
 import os
+import tensorflow as tf
 from sklearn.preprocessing import LabelBinarizer
 
 #随机截取固定大小图片（160*160）
@@ -34,7 +35,7 @@ def get_image(filename,k):
     cap.release()
     return r
 
-def get_file(filePath):
+def load_data(filePath,k):
     l = os.listdir(filePath)
     l.sort()
     n = np.array(l)
@@ -47,21 +48,24 @@ def get_file(filePath):
         document = os.listdir(fp)
         document.sort()
         for j in document: 
-            # r = get_image(fp+'/'+j,5) 
-            # r = r.reshape(1,5,160,160,3)
-            # print(r.shape)
-            # print(fp+'/'+j)
-            r = fp + '/' + j
+            r = get_image(fp+'/'+j,k) 
+            r = r.reshape(1,k,160,160,3)
             if Flag == True:
                 data_x = r
                 data_y = y[count]
                 Flag = False
             else:
-                data_x = np.concatenate((data_x,r),axis=0)
-                data_y = np.concatenate((data_y,y[count]),axis=0)
-            #print(data_x.shape)
+                # data_x = np.concatenate((data_x,r),axis=0)
+                # data_y = np.concatenate((data_y,y[count]),axis=0)
+                data_x = data_x + r
+                data_y = data_y + y[count]
+            print(i,j,data_x.shape[0])
+            if data_x.shape[0] >= 500:
+                break
         count = count+1
-    #print(data_x.shape)
+        if data_x.shape[0] >= 500:
+            break
+    print('load_data,successful!')
     return data_x,data_y
 
 def shuffle_data(data_x,data_y):
@@ -71,20 +75,6 @@ def shuffle_data(data_x,data_y):
     data_y = np.random.permutation(data_y)
     return data_x,data_y
 
-def shuffle_batch(image,label,batch_size):
-    num_preprocess_threads = 16
-    images, label_batch = tf.train.shuffle_batch(
-    [image, label],
-    batch_size=batch_size,
-    num_threads=num_preprocess_threads,
-    capacity=min_queue_examples + 3 * batch_size,
-    min_after_dequeue=min_queue_examples)
-
-    # Display the training images in the visualizer.
-    tf.image_summary('images', images)
-
-    return images, tf.reshape(label_batch, [batch_size])
-
 def train_test(data_x,data_y,rate):
     data_x,data_y = shuffle_data(data_x,data_y)
     train_x = data_x[0:int(rate*data_x.shape[0])]
@@ -92,21 +82,3 @@ def train_test(data_x,data_y,rate):
     train_y = data_y[0:int(rate*data_y.shape[0])]
     test_y = data_y[int(rate*data_y.shape[0]):]
     return train_x,train_y,test_x,test_y
-
-def load_data(Files,Labels,k):
-    count = 0
-    Flag = True
-    for i in Files:
-        r = get_image(i,k)
-        if Flag == True:
-                X = r
-                Y = Labels[count]
-                Flag = False
-        else:
-            X = np.concatenate((X,r),axis=0)
-            Y = np.concatenate((Y,Labels[count]),axis=0)
-    count = count + 1
-    return X,Y
-
-#load_data('/Users/liyixun/Downloads/UCF-101/')
-#load_data('/Users/liyixun/Downloads/ucf/')
